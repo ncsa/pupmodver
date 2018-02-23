@@ -42,12 +42,8 @@ class PuppetModule( object ):
 
 
     def has_update( self ):
-        print( "...self.has_update()")
-        pprint.pprint( self )
         rv = False
         if self.installed_version and self.latest_version():
-            pprint.pprint( self.installed_version )
-            pprint.pprint( self._latest_version )
             cur = distutils.version.LooseVersion( self.installed_version )
             new = distutils.version.LooseVersion( self._latest_version )
             rv = cur < new
@@ -70,18 +66,6 @@ def construct_ruby_object(loader, suffix, node):
 
 def construct_ruby_sym(loader, node):
     return loader.construct_yaml_str(node)
-
-
-#def get_current_version( forgename ):
-#    # forgename has a fwd slash, replace with a dash for API URL
-#    apiname = forgename.replace( '/', '-' )
-#    url = 'https://forge.puppetlabs.com:443/v3/modules/{}'.format( apiname )
-#    response = requests.get(url)
-#    if response.status_code != 200:
-#        response.raise_for_status()
-#        #raise ApiError('GET ' + moduleURL + '{}'.format(response.status_code))    
-#    version = response.json()['current_release']['version']
-#    return version
     
 
 def get_local_puppet_modules( env ):
@@ -100,6 +84,10 @@ def get_local_puppet_modules( env ):
 #        pprint.pprint( modhash )
         m = PuppetModule()
         m.name = modhash[ 'name' ]
+        try:
+            m.name = modhash[ 'metadata' ][ 'name' ]
+        except ( KeyError ) as e:
+            pass
         try:
             m.forgename = modhash[ 'forge_name' ]
             m.installed_version = modhash[ 'version' ]
@@ -133,23 +121,6 @@ def run():
                 print( m )
         else:
             print( m )
-#    #local_data = list( get_local_puppet_modules() )[0]
-#    #pprint.pprint( local_data, depth=4 )
-#    modules_by_path = local_data[ ':modules_by_path' ]
-#    for module_list in modules_by_path.values():
-#        for m in module_list:
-#            if 'forge_name' in m and 'version' in m:
-#                fname = m['forge_name']
-#                installed_version = distutils.version.LooseVersion( m['version'] )
-#                #installed_version = m['version']
-#                try:
-#                    latest_version = distutils.version.LooseVersion( get_current_version( fname ) )
-#                except ( requests.exceptions.HTTPError ) as e:
-#                    continue
-#                status = 'OK'
-#                if installed_version < latest_version:
-#                    status = 'UPGRADE'
-#                print( '{:7s} {:33s} [{:8s}] ({:8s})'.format( status, fname, installed_version, latest_version ) )
 
 
 if __name__ == "__main__":
