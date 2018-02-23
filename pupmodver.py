@@ -55,7 +55,7 @@ class PuppetModule( object ):
             c=self.__class__.__name__,
             n=self.name,
             i=self.installed_version,
-            l=self._latest_version
+            l=self.latest_version()
             )
 
     __repr__ = __str__
@@ -81,7 +81,6 @@ def get_local_puppet_modules( env ):
     # parse yaml data into a list of PuppetModule objects
     local_modules = []
     for modhash in mod_data_list:
-#        pprint.pprint( modhash )
         m = PuppetModule()
         m.name = modhash[ 'name' ]
         try:
@@ -93,9 +92,15 @@ def get_local_puppet_modules( env ):
             m.installed_version = modhash[ 'version' ]
         except ( KeyError ) as e:
             pass
-#        pprint.pprint( m )
         local_modules.append( m )
     return local_modules
+
+
+def print_module( args, m ):
+    if args.terse:
+        print( m.name )
+    else:
+        print( m )
 
 
 def process_cmdline():
@@ -103,6 +108,8 @@ def process_cmdline():
     parser.add_argument( '-e', '--environment' )
     parser.add_argument( '-u', '--updates-only', action='store_true',
         help='Show only modules with available updates' )
+    parser.add_argument( '-t', '--terse', action='store_true',
+        help='Terse output (list module names only)' )
     args = parser.parse_args()
     return args
 
@@ -118,9 +125,9 @@ def run():
     for m in local_modules:
         if args.updates_only:
             if m.has_update():
-                print( m )
+                print_module( args, m )
         else:
-            print( m )
+            print_module( args, m )
 
 
 if __name__ == "__main__":
