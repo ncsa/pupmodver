@@ -7,6 +7,9 @@ Check for new versions of installed puppet modules
 1. venv/bin/pip install -r requirements.txt
 1. venv/bin/python pupmodver/pupmodver.py -h
 
+## Update all modules in a single environment
+1. `ENV=test; venv/bin/python pupmodver/pupmodver.py -ut -e $ENV | xargs -n1 puppet module upgrade --environment $ENV`
+
 # Puppet Environment Isolation
 1. Update all environments
    1. `ls /etc/puppetlabs/code/environments/ | xargs -n1 puppet generate types --force --environment`
