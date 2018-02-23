@@ -72,7 +72,7 @@ def get_local_puppet_modules( env ):
     # get yaml data from local puppet instance
     puppetPath = "/opt/puppetlabs/bin/puppet"
     cmd = [ puppetPath ]
-    args = [ "module", "list", "--render-as", "yaml" ]
+    args = [ "module", "list", "--environment", str( env ), "--render-as", "yaml" ]
     myPuppet = subprocess.check_output( cmd + args )
     data = list( yaml.load_all(myPuppet) )[0]
     # first path is the environment specific path
