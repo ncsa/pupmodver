@@ -51,14 +51,17 @@ class PuppetModule( object ):
 
 
     def __str__( self ):
-        return '<{c} {n} ({i}) [{l}]>'.format( 
-            c=self.__class__.__name__,
+        return '{n} ({i}) [{l}]'.format( 
             n=self.name,
             i=self.installed_version,
             l=self.latest_version()
             )
 
-    __repr__ = __str__
+    def __repr__( self ):
+        return '<{c} {s}>'.format( 
+            c=self.__class__.__name__,
+            s=str( self )
+            )
 
 
 def construct_ruby_object(loader, suffix, node):
@@ -110,6 +113,10 @@ def process_cmdline():
         help='Show only modules with available updates' )
     parser.add_argument( '-t', '--terse', action='store_true',
         help='Terse output (list module names only)' )
+    defaults = { 
+        'environment': 'production',
+    }
+    parser.set_defaults( **defaults )
     args = parser.parse_args()
     return args
 
