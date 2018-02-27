@@ -12,4 +12,4 @@ Check for new versions of installed puppet modules
 
 # Puppet Environment Isolation
 1. Update all environments
-   1. `ls /etc/puppetlabs/code/environments/ | xargs -n1 puppet generate types --force --environment`
+   1. `ls $(puppet config print environmentpath) | xargs -n1 puppet generate types --force --environment`
