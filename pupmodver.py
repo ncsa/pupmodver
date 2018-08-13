@@ -63,6 +63,17 @@ class PuppetModule( object ):
             s=str( self )
             )
 
+    def current_version_as_r10k( self ):
+        return "mod '{n}', '{v}'".format(
+            n=self.name,
+            v=self.installed_version
+            )
+
+    def latest_version_as_r10k( self ):
+        return "mod '{n}', '{v}'".format(
+            n=self.name,
+            v=self.latest_version()
+            )
 
 def construct_ruby_object(loader, suffix, node):
     return loader.construct_yaml_map(node)
@@ -112,6 +123,11 @@ def get_local_puppet_modules( env ):
 def print_module( args, m ):
     if args.terse:
         print( m.name )
+    elif args.r10k:
+        if args.updates_only:
+            print( m.latest_version_as_r10k() )
+        else:
+            print( m.current_version_as_r10k() )
     else:
         print( m )
 
@@ -123,6 +139,8 @@ def process_cmdline():
         help='Show only modules with available updates' )
     parser.add_argument( '-t', '--terse', action='store_true',
         help='Terse output (list module names only)' )
+    parser.add_argument( '-r', '--r10k', action='store_true',
+        help='Print modules in r10k Puppetfile format' )
     defaults = { 
         'environment': 'production',
     }
