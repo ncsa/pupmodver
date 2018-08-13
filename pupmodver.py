@@ -78,24 +78,34 @@ def get_local_puppet_modules( env ):
     args = [ "module", "list", "--environment", str( env ), "--render-as", "yaml" ]
     myPuppet = subprocess.check_output( cmd + args )
     data = list( yaml.load_all(myPuppet) )[0]
-    # first path is the environment specific path
-    path = data[ ':environment' ][ 'modulepath' ][0]
-    mod_data_list = data[ ':modules_by_path' ][ path ]
-    # parse yaml data into a list of PuppetModule objects
+    #pprint.pprint( data )
+    # need to use all paths, but keep track of names to ignore duplicates
     local_modules = []
-    for modhash in mod_data_list:
-        m = PuppetModule()
-        m.name = modhash[ 'name' ]
-        try:
-            m.name = modhash[ 'metadata' ][ 'name' ]
-        except ( KeyError ) as e:
-            pass
-        try:
-            m.forgename = modhash[ 'forge_name' ]
-            m.installed_version = modhash[ 'version' ]
-        except ( KeyError ) as e:
-            pass
-        local_modules.append( m )
+    names_only = []
+    #pprint.pprint( data[ ':environment' ][ 'modulepath' ] )
+    for path in data[ ':environment' ][ 'modulepath' ]:
+        if path not in data[ ':modules_by_path' ]:
+            continue
+        mod_data_list = data[ ':modules_by_path' ][ path ]
+        #pprint.pprint( mod_data_list )
+        # parse yaml data into a list of PuppetModule objects
+        for modhash in mod_data_list:
+            m = PuppetModule()
+            m.name = modhash[ 'name' ]
+            # Skip modules already found once (in case of duplicates, puppet uses first one found)
+            if m.name in names_only:
+                continue
+            names_only.append( m.name )
+            try:
+                m.name = modhash[ 'metadata' ][ 'name' ]
+            except ( KeyError ) as e:
+                pass
+            try:
+                m.forgename = modhash[ 'forge_name' ]
+                m.installed_version = modhash[ 'version' ]
+            except ( KeyError ) as e:
+                pass
+            local_modules.append( m )
     return local_modules
 
 
