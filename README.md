@@ -3,6 +3,7 @@ Check for new versions of installed puppet modules
 
 # Usage
 1. python3 -m venv venv
+1. venv/bin/pip install -U pip
 1. venv/bin/pip install -r requirements.txt
 1. venv/bin/python pupmodver.py -h
 
