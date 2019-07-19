@@ -88,7 +88,7 @@ def get_local_puppet_modules( env ):
     cmd = [ puppetPath ]
     args = [ "module", "list", "--environment", str( env ), "--render-as", "yaml" ]
     myPuppet = subprocess.check_output( cmd + args )
-    data = list( yaml.load_all(myPuppet) )[0]
+    data = list( yaml.load_all(myPuppet, Loader=yaml.Loader) )[0]
     #pprint.pprint( data )
     # need to use all paths, but keep track of names to ignore duplicates
     local_modules = []
